@@ -35571,7 +35571,7 @@ exports.Nav = mobx_react_1.observer(function () {
         React.createElement(components_1.Horizontal, null,
             React.createElement("a", { href: 'https://github.com/basarat/yester/tree/master/src/demo', target: "_blank" }, "Code for the demo"),
             React.createElement("a", { href: 'http://basarat.com/yester', target: "_blank" }, "Yester Docs"),
-            React.createElement("a", { href: 'https://gitub.com/basarat/yester', target: "_blank" }, "Star it on github \u2B50")));
+            React.createElement("a", { href: 'https://github.com/basarat/yester', target: "_blank" }, "Star it on github \u2B50")));
 });
 /**
  * Pages
