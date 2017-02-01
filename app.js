@@ -35107,9 +35107,13 @@ var Router = (function () {
                             result = _b.sent();
                             if (result == null) {
                             }
-                            else if (result === false) {
-                                dom.setHash(oldHash, true);
-                                return [2 /*return*/];
+                            else if (typeof result === 'boolean') {
+                                if (result === false) {
+                                    dom.setHash(oldHash, true);
+                                    return [2 /*return*/];
+                                }
+                                else {
+                                }
                             }
                             else if (result.redirect) {
                                 this.navigate(result.redirect, result.replace);

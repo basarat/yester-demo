@@ -15,7 +15,7 @@ export declare type RouteBeforeEnterResult = null | undefined | {
     replace?: boolean;
 }>;
 export declare type RouteEnterResult = void;
-export declare type RouteBeforeLeaveResult = null | undefined | false | {
+export declare type RouteBeforeLeaveResult = null | undefined | boolean | Promise<boolean> | {
     redirect: string;
     replace?: boolean;
 } | Promise<{
