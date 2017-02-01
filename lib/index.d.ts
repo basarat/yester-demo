@@ -44,10 +44,17 @@ export interface RouteConfig {
 export declare class Router {
     routes: RouteConfig[];
     constructor(routes: RouteConfig[]);
-    navigate(path: string, replace?: boolean): void;
     /**
      * Runs through the config and triggers an routes that matches the current path
      */
     init(): Promise<void>;
     private trigger;
 }
+/**
+ * Navigates to the given path
+ */
+export declare function navigate(path: string, replace?: boolean): void;
+/**
+ * Gives you a link that when triggered, navigates to the given path
+ */
+export declare function link(path: string): string;
