@@ -17741,13 +17741,19 @@ exports.Button = function (props) {
 exports.Alert = function (props) { return React.createElement("div", { style: { padding: '10px', backgroundColor: '#ffa3a3', color: '#883b3b' } }, props.children); };
 exports.AlertSuccess = function (props) { return React.createElement("div", { style: { padding: '10px', backgroundColor: '#f0ffef', color: '#43883b' } }, props.children); };
 exports.Vertical = function (_a) {
-    var children = _a.children;
-    return React.createElement("div", { className: typestyle_1.style(csstips_1.verticallySpaced(10)), children: children });
+    var children = _a.children, className = _a.className;
+    return React.createElement("div", { className: typestyle_1.classes(typestyle_1.style(csstips_1.verticallySpaced(10)), className), children: children });
 };
 exports.Horizontal = function (_a) {
     var children = _a.children;
     return React.createElement("div", { className: typestyle_1.style(csstips_1.horizontallySpaced(10)), children: children });
 };
+exports.fadeIn = typestyle_1.style({
+    animationName: typestyle_1.keyframes({
+        from: { opacity: 0 }, to: { opacity: 1 },
+    }),
+    animationDuration: '.5s',
+});
 
 
 /***/ }),

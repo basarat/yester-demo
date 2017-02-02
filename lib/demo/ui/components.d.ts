@@ -8,9 +8,11 @@ export declare const Alert: (props: {
 export declare const AlertSuccess: (props: {
     children?: any;
 }) => JSX.JSXElement;
-export declare const Vertical: ({children}: {
+export declare const Vertical: ({children, className}: {
     children?: any;
+    className?: string;
 }) => JSX.JSXElement;
 export declare const Horizontal: ({children}: {
     children?: any;
 }) => JSX.JSXElement;
+export declare const fadeIn: string;
