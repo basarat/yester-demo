@@ -11164,14 +11164,14 @@ var actionFieldDecorator = createClassPropertyDecorator(function (target, key, v
 }, function (key) {
     return this[key];
 }, function () {
-    invariant(false, "It is not allowed to assign new values to @action fields");
+    invariant(false, getMessage("m001"));
 }, false, true);
 var boundActionDecorator = createClassPropertyDecorator(function (target, key, value) {
     defineBoundAction(target, key, value);
 }, function (key) {
     return this[key];
 }, function () {
-    invariant(false, "It is not allowed to assign new values to @action fields");
+    invariant(false, getMessage("m001"));
 }, false, false);
 var action = function action(arg1, arg2, arg3, arg4) {
     if (arguments.length === 1 && typeof arg1 === "function")
@@ -11206,8 +11206,8 @@ function runInAction(arg1, arg2, arg3) {
     var actionName = typeof arg1 === "string" ? arg1 : arg1.name || "<unnamed action>";
     var fn = typeof arg1 === "function" ? arg1 : arg2;
     var scope = typeof arg1 === "function" ? arg2 : arg3;
-    invariant(typeof fn === "function", "`runInAction` expects a function");
-    invariant(fn.length === 0, "`runInAction` expects a function without arguments");
+    invariant(typeof fn === "function", getMessage("m002"));
+    invariant(fn.length === 0, getMessage("m003"));
     invariant(typeof actionName === "string" && actionName.length > 0, "actions should have valid names, got: '" + actionName + "'");
     return executeAction(actionName, fn, scope, undefined);
 }
@@ -11235,8 +11235,8 @@ function autorun(arg1, arg2, arg3) {
         view = arg1;
         scope = arg2;
     }
-    invariant(typeof view === "function", "autorun expects a function");
-    invariant(isAction(view) === false, "Warning: attempted to pass an action to autorun. Actions are untracked and will not trigger on state changes. Use `reaction` or wrap only your state modification code in an action.");
+    invariant(typeof view === "function", getMessage("m004"));
+    invariant(isAction(view) === false, getMessage("m005"));
     if (scope)
         view = view.bind(scope);
     var reaction = new Reaction(name, function () {
@@ -11288,7 +11288,7 @@ function autorunAsync(arg1, arg2, arg3, arg4) {
         delay = arg2;
         scope = arg3;
     }
-    invariant(isAction(func) === false, "Warning: attempted to pass an action to autorunAsync. Actions are untracked and will not trigger on state changes. Use `reaction` or wrap only your state modification code in an action.");
+    invariant(isAction(func) === false, getMessage("m006"));
     if (delay === void 0)
         delay = 1;
     if (scope)
@@ -11311,10 +11311,10 @@ function autorunAsync(arg1, arg2, arg3, arg4) {
 exports.autorunAsync = autorunAsync;
 function reaction(expression, effect, arg3) {
     if (arguments.length > 3) {
-        fail("reaction only accepts 2 or 3 arguments. If migrating from MobX 2, please provide an options object");
+        fail(getMessage("m007"));
     }
     if (isModifierDescriptor(expression)) {
-        fail("wrapping reaction expression in `asReference` is no longer supported, use options object instead");
+        fail(getMessage("m008"));
     }
     var opts;
     if (typeof arg3 === "object") {
@@ -11368,8 +11368,8 @@ function reaction(expression, effect, arg3) {
 exports.reaction = reaction;
 function createComputedDecorator(compareStructural) {
     return createClassPropertyDecorator(function (target, name, _, __, originalDescriptor) {
-        invariant(typeof originalDescriptor !== "undefined", "@computed can only be used on getter functions, like: '@computed get myProps() { return ...; }'. It looks like it was used on a property.");
-        invariant(typeof originalDescriptor.get === "function", "@computed can only be used on getter functions, like: '@computed get myProps() { return ...; }'");
+        invariant(typeof originalDescriptor !== "undefined", getMessage("m009"));
+        invariant(typeof originalDescriptor.get === "function", getMessage("m010"));
         var adm = asObservableObject(target, "");
         defineComputedProperty(adm, name, originalDescriptor.get, originalDescriptor.set, compareStructural, false);
     }, function (name) {
@@ -11387,8 +11387,8 @@ var computed = (function computed(arg1, arg2, arg3) {
     if (typeof arg2 === "string") {
         return computedDecorator.apply(null, arguments);
     }
-    invariant(typeof arg1 === "function", "First argument to `computed` should be an expression. If using computed as decorator, don't pass it arguments");
-    invariant(arguments.length < 3, "computed takes one or two arguments if used as function");
+    invariant(typeof arg1 === "function", getMessage("m011"));
+    invariant(arguments.length < 3, getMessage("m012"));
     var opts = typeof arg2 === "object" ? arg2 : {};
     opts.setter = typeof arg2 === "function" ? arg2 : opts.setter;
     return new ComputedValue(arg1, opts.context, opts.compareStructural || opts.struct || false, opts.name || arg1.name || "", opts.setter);
@@ -11442,7 +11442,7 @@ function getMemoizationId(object) {
 }
 function expr(expr, scope) {
     if (!isComputingDerivation())
-        console.warn("[mobx.expr] 'expr' should only be used inside other reactive functions.");
+        console.warn(getMessage("m013"));
     return computed(expr, { context: scope }).get();
 }
 exports.expr = expr;
@@ -11463,12 +11463,12 @@ function extendShallowObservable(target) {
 }
 exports.extendShallowObservable = extendShallowObservable;
 function extendObservableHelper(target, defaultEnhancer, properties) {
-    invariant(arguments.length >= 2, "extendObservable expected 2 or more arguments");
-    invariant(typeof target === "object", "extendObservable expects an object as first argument");
-    invariant(!(isObservableMap(target)), "extendObservable should not be used on maps, use map.merge instead");
+    invariant(arguments.length >= 2, getMessage("m014"));
+    invariant(typeof target === "object", getMessage("m015"));
+    invariant(!(isObservableMap(target)), getMessage("m016"));
     properties.forEach(function (propSet) {
-        invariant(typeof propSet === "object", "all arguments of extendObservable should be objects");
-        invariant(!isObservable(propSet), "extending an object with another observable (object) is not supported. Please construct an explicit propertymap, using `toJS` if need. See issue #540");
+        invariant(typeof propSet === "object", getMessage("m017"));
+        invariant(!isObservable(propSet), getMessage("m018"));
     });
     var adm = asObservableObject(target);
     var definedProps = {};
@@ -11537,7 +11537,7 @@ function isObservable(value, property) {
         return false;
     if (property !== undefined) {
         if (isObservableArray(value) || isObservableMap(value))
-            throw new Error("[mobx.isObservable] isObservable(object, propertyName) is not supported for arrays and maps. Use map.has or array.length instead.");
+            throw new Error(getMessage("m019"));
         else if (isObservableObject(value)) {
             var o = value.$mobx;
             return o.values && !!o.values[property];
@@ -11556,8 +11556,8 @@ function createObservable(v) {
     if (v === void 0) { v = undefined; }
     if (typeof arguments[1] === "string")
         return deepDecorator.apply(null, arguments);
-    invariant(arguments.length <= 1, "observable expects zero or one arguments");
-    invariant(!isModifierDescriptor(v), "modifiers can only be used for individual object properties");
+    invariant(arguments.length <= 1, getMessage("m021"));
+    invariant(!isModifierDescriptor(v), getMessage("m020"));
     if (isObservable(v))
         return v;
     var res = deepEnhancer(v, undefined, undefined);
@@ -11668,11 +11668,9 @@ function createDecoratorForEnhancer(enhancer) {
     invariant(!!enhancer, ":(");
     return createClassPropertyDecorator(function (target, name, baseValue, _, baseDescriptor) {
         assertPropertyConfigurable(target, name);
-        invariant(!baseDescriptor || !baseDescriptor.get, "@observable can not be used on getters, use @computed instead");
-        var prevA = allowStateChangesStart(true);
+        invariant(!baseDescriptor || !baseDescriptor.get, getMessage("m022"));
         var adm = asObservableObject(target, undefined);
         defineObservableProperty(adm, name, baseValue, enhancer);
-        allowStateChangesEnd(prevA);
     }, function (name) {
         var observable = this.$mobx.values[name];
         if (observable === undefined)
@@ -11738,7 +11736,7 @@ function toJS(source, detectCycles, __alreadySeen) {
 exports.toJS = toJS;
 function transaction(action, thisArg) {
     if (thisArg === void 0) { thisArg = undefined; }
-    deprecated("Using `transaction` is deprecated, use `runInAction` or `(@)action` instead.");
+    deprecated(getMessage("m023"));
     return runInTransaction.apply(undefined, arguments);
 }
 exports.transaction = transaction;
@@ -11755,7 +11753,7 @@ function whyRun(thing, prop) {
         case 0:
             thing = globalState.trackingDerivation;
             if (!thing)
-                return log("whyRun() can only be used if a derivation is active, or by passing an computed value / reaction explicitly. If you invoked whyRun from inside a computation; the computation is currently suspended but re-evaluating because somebody requested its value.");
+                return log(getMessage("m024"));
             break;
         case 2:
             thing = getAtom(thing, prop);
@@ -11766,11 +11764,11 @@ function whyRun(thing, prop) {
         return log(thing.whyRun());
     else if (isReaction(thing))
         return log(thing.whyRun());
-    return fail("whyRun can only be used on reactions and computed values");
+    return fail(getMessage("m025"));
 }
 exports.whyRun = whyRun;
 function createAction(actionName, fn) {
-    invariant(typeof fn === "function", "`action` can only be invoked on functions");
+    invariant(typeof fn === "function", getMessage("m026"));
     invariant(typeof actionName === "string" && actionName.length > 0, "actions should have valid names, got: '" + actionName + "'");
     var res = function () {
         return executeAction(actionName, fn, this, arguments);
@@ -11789,7 +11787,6 @@ function executeAction(actionName, fn, scope, args) {
     }
 }
 function startAction(actionName, fn, scope, args) {
-    invariant(!isComputedValue(globalState.trackingDerivation), "Computed values or transformers should not invoke actions or trigger other side effects");
     var notifySpy = isSpyEnabled() && !!actionName;
     var startTime = 0;
     if (notifySpy) {
@@ -11825,7 +11822,7 @@ function endAction(runInfo) {
         spyReportEnd({ time: Date.now() - runInfo.startTime });
 }
 function useStrict(strict) {
-    invariant(globalState.trackingDerivation === null, "It is not allowed to set `useStrict` when a derivation is running");
+    invariant(globalState.trackingDerivation === null, getMessage("m028"));
     globalState.strictMode = strict;
     globalState.allowStateChanges = !strict;
 }
@@ -11836,8 +11833,13 @@ function isStrictModeEnabled() {
 exports.isStrictModeEnabled = isStrictModeEnabled;
 function allowStateChanges(allowStateChanges, func) {
     var prev = allowStateChangesStart(allowStateChanges);
-    var res = func();
-    allowStateChangesEnd(prev);
+    var res;
+    try {
+        res = func();
+    }
+    finally {
+        allowStateChangesEnd(prev);
+    }
     return res;
 }
 function allowStateChangesStart(allowStateChanges) {
@@ -11935,7 +11937,7 @@ var ComputedValue = (function () {
         propagateMaybeChanged(this);
     };
     ComputedValue.prototype.onBecomeUnobserved = function () {
-        invariant(this.dependenciesState !== IDerivationState.NOT_TRACKING, "INTERNAL ERROR only onBecomeUnobserved shouldn't be called twice in a row");
+        invariant(this.dependenciesState !== IDerivationState.NOT_TRACKING, getMessage("m029"));
         clearObserving(this);
         this.value = undefined;
     };
@@ -11992,7 +11994,7 @@ var ComputedValue = (function () {
     };
     ComputedValue.prototype.computeValue = function (track) {
         this.isComputing = true;
-        var prevAllowStateChanges = allowStateChangesStart(false);
+        globalState.computationDepth++;
         var res;
         if (track) {
             res = trackDerivedFunction(this, this.derivation, this.scope);
@@ -12005,7 +12007,7 @@ var ComputedValue = (function () {
                 res = new CaughtException(e);
             }
         }
-        allowStateChangesEnd(prevAllowStateChanges);
+        globalState.computationDepth--;
         this.isComputing = false;
         return res;
     };
@@ -12045,11 +12047,8 @@ var ComputedValue = (function () {
         var observing = unique(this.isComputing ? this.newObserving : this.observing).map(function (dep) { return dep.name; });
         var observers = unique(getObservers(this).map(function (dep) { return dep.name; }));
         return ("\nWhyRun? computation '" + this.name + "':\n * Running because: " + (isTracking ? "[active] the value of this computation is needed by a reaction" : this.isComputing ? "[get] The value of this computed was requested outside a reaction" : "[idle] not running at the moment") + "\n" +
-            (this.dependenciesState === IDerivationState.NOT_TRACKING
-                ?
-                    " * This computation is suspended (not in use by any reaction) and won't run automatically.\n\tDidn't expect this computation to be suspended at this point?\n\t  1. Make sure this computation is used by a reaction (reaction, autorun, observer).\n\t  2. Check whether you are using this computation synchronously (in the same stack as they reaction that needs it).\n"
-                :
-                    " * This computation will re-run if any of the following observables changes:\n    " + joinStrings(observing) + "\n    " + ((this.isComputing && isTracking) ? " (... or any observable accessed during the remainder of the current run)" : "") + "\n\tMissing items in this list?\n\t  1. Check whether all used values are properly marked as observable (use isObservable to verify)\n\t  2. Make sure you didn't dereference values too early. MobX observes props, not primitives. E.g: use 'person.name' instead of 'name' in your computation.\n  * If the outcome of this computation changes, the following observers will be re-run:\n    " + joinStrings(observers) + "\n"));
+            (this.dependenciesState === IDerivationState.NOT_TRACKING ? getMessage("m032") :
+                " * This computation will re-run if any of the following observables changes:\n    " + joinStrings(observing) + "\n    " + ((this.isComputing && isTracking) ? " (... or any observable accessed during the remainder of the current run)" : "") + "\n\t" + getMessage("m038") + "\n\n  * If the outcome of this computation changes, the following observers will be re-run:\n    " + joinStrings(observers) + "\n"));
     };
     return ComputedValue;
 }());
@@ -12105,12 +12104,12 @@ function shouldCompute(derivation) {
 function isComputingDerivation() {
     return globalState.trackingDerivation !== null;
 }
-function checkIfStateModificationsAreAllowed() {
-    if (!globalState.allowStateChanges) {
-        invariant(false, globalState.strictMode
-            ? "It is not allowed to create or change state outside an `action` when MobX is in strict mode. Wrap the current method in `action` if this state change is intended"
-            : "It is not allowed to change the state when a computed value or transformer is being evaluated. Use 'autorun' to create reactive functions with side-effects.");
-    }
+function checkIfStateModificationsAreAllowed(atom) {
+    var hasObservers = atom.observers.length > 0;
+    if (globalState.computationDepth > 0 && hasObservers)
+        fail(getMessage("m031") + atom.name);
+    if (!globalState.allowStateChanges && hasObservers)
+        fail(getMessage(globalState.strictMode ? "m030a" : "m030b") + atom.name);
 }
 function trackDerivedFunction(derivation, f, context) {
     changeDependenciesStateTo0(derivation);
@@ -12198,6 +12197,7 @@ var MobXGlobals = (function () {
     function MobXGlobals() {
         this.version = 5;
         this.trackingDerivation = null;
+        this.computationDepth = 0;
         this.runId = 0;
         this.mobxGuid = 0;
         this.inBatch = 0;
@@ -12453,8 +12453,8 @@ var Reaction = (function () {
             this.errorHandler(error, this);
             return;
         }
-        var message = "[mobx] Catched uncaught exception that was thrown by a reaction or observer component, in: '" + this;
-        var messageToUser = "\n\t\tHi there! I'm sorry you have just run into an exception.\n\n\t\tIf your debugger ends up here, know that some reaction (like the render() of an observer component, autorun or reaction)\n\t\tthrew an exception and that mobx catched it, too avoid that it brings the rest of your application down.\n\n\t\tThe original cause of the exception (the code that caused this reaction to run (again)), is still in the stack.\n\n\t\tHowever, more interesting is the actual stack trace of the error itself.\n\t\tHopefully the error is an instanceof Error, because in that case you can inspect the original stack of the error from where it was thrown.\n\t\tSee `error.stack` property, or press the very subtle \"(...)\" link you see near the console.error message that probably brought you here.\n\t\tThat stack is more interesting than the stack of this console.error itself.\n\n\t\tIf the exception you see is an exception you created yourself, make sure to use `throw new Error(\"Oops\")` instead of `throw \"Oops\"`,\n\t\tbecause the javascript environment will only preserve the original stack trace in the first form.\n\n\t\tYou can also make sure the debugger pauses the next time this very same exception is thrown by enabling \"Pause on caught exception\".\n\t\t(Note that it might pause on many other, unrelated exception as well).\n\n\t\tIf that all doesn't help you out, feel free to open an issue https://github.com/mobxjs/mobx/issues!\n\t\t";
+        var message = "[mobx] Encountered an uncaught exception that was thrown by a reaction or observer component, in: '" + this;
+        var messageToUser = getMessage("m037");
         console.error(message || messageToUser, error);
         if (isSpyEnabled()) {
             spyReport({
@@ -12487,7 +12487,7 @@ var Reaction = (function () {
     };
     Reaction.prototype.whyRun = function () {
         var observing = unique(this._isRunning ? this.newObserving : this.observing).map(function (dep) { return dep.name; });
-        return ("\nWhyRun? reaction '" + this.name + "':\n * Status: [" + (this.isDisposed ? "stopped" : this._isRunning ? "running" : this.isScheduled() ? "scheduled" : "idle") + "]\n * This reaction will re-run if any of the following observables changes:\n    " + joinStrings(observing) + "\n    " + ((this._isRunning) ? " (... or any observable accessed during the remainder of the current run)" : "") + "\n\tMissing items in this list?\n\t  1. Check whether all used values are properly marked as observable (use isObservable to verify)\n\t  2. Make sure you didn't dereference values too early. MobX observes props, not primitives. E.g: use 'person.name' instead of 'name' in your computation.\n");
+        return ("\nWhyRun? reaction '" + this.name + "':\n * Status: [" + (this.isDisposed ? "stopped" : this._isRunning ? "running" : this.isScheduled() ? "scheduled" : "idle") + "]\n * This reaction will re-run if any of the following observables changes:\n    " + joinStrings(observing) + "\n    " + ((this._isRunning) ? " (... or any observable accessed during the remainder of the current run)" : "") + "\n\t" + getMessage("m038") + "\n");
     };
     return Reaction;
 }());
@@ -12518,9 +12518,9 @@ function runReactionsHelper() {
     var iterations = 0;
     while (allReactions.length > 0) {
         if (++iterations === MAX_REACTION_ITERATIONS) {
-            allReactions.splice(0);
             console.error("Reaction doesn't converge to a stable state after " + MAX_REACTION_ITERATIONS + " iterations."
                 + (" Probably there is a cycle in the reactive function: " + allReactions[0]));
+            allReactions.splice(0);
         }
         var remainingReactions = allReactions.splice(0);
         for (var i = 0, l = remainingReactions.length; i < l; i++)
@@ -12766,7 +12766,7 @@ var ObservableArrayAdministration = (function () {
     };
     ObservableArrayAdministration.prototype.spliceWithArray = function (index, deleteCount, newItems) {
         var _this = this;
-        checkIfStateModificationsAreAllowed();
+        checkIfStateModificationsAreAllowed(this.atom);
         var length = this.values.length;
         if (index === undefined)
             index = 0;
@@ -13068,7 +13068,7 @@ function createArraySetter(index) {
         var adm = this.$mobx;
         var values = adm.values;
         if (index < values.length) {
-            checkIfStateModificationsAreAllowed();
+            checkIfStateModificationsAreAllowed(adm.atom);
             var oldValue = values[index];
             if (hasInterceptors(adm)) {
                 var change = interceptChange(adm, {
@@ -13123,7 +13123,6 @@ var ObservableMap = (function () {
     function ObservableMap(initialData, enhancer, name) {
         if (enhancer === void 0) { enhancer = deepEnhancer; }
         if (name === void 0) { name = "ObservableMap@" + getNextId(); }
-        var _this = this;
         this.enhancer = enhancer;
         this.name = name;
         this.$mobx = ObservableMapMarker;
@@ -13132,9 +13131,7 @@ var ObservableMap = (function () {
         this._keys = new ObservableArray(undefined, referenceEnhancer, this.name + ".keys()", true);
         this.interceptors = null;
         this.changeListeners = null;
-        allowStateChanges(true, function () {
-            _this.merge(initialData);
-        });
+        this.merge(initialData);
     }
     ObservableMap.prototype._has = function (key) {
         return typeof this._data[key] !== "undefined";
@@ -13350,7 +13347,7 @@ var ObservableMap = (function () {
         return this.name + "[{ " + this.keys().map(function (key) { return key + ": " + ("" + _this.get(key)); }).join(", ") + " }]";
     };
     ObservableMap.prototype.observe = function (listener, fireImmediately) {
-        invariant(fireImmediately !== true, "`observe` doesn't support the fire immediately property for observable maps.");
+        invariant(fireImmediately !== true, getMessage("m033"));
         return registerListener(this, listener);
     };
     ObservableMap.prototype.intercept = function (handler) {
@@ -13389,7 +13386,7 @@ var ObservableObjectAdministration = (function () {
 function asObservableObject(target, name) {
     if (isObservableObject(target))
         return target.$mobx;
-    invariant(Object.isExtensible(target), "Cannot make the designated object observable; it is not extensible");
+    invariant(Object.isExtensible(target), getMessage("m035"));
     if (!isPlainObject(target))
         name = (target.constructor.name || "ObservableObject") + "@" + getNextId();
     if (!name)
@@ -13577,7 +13574,7 @@ var ObservableValue = (function (_super) {
         }
     };
     ObservableValue.prototype.prepareNewValue = function (newValue) {
-        checkIfStateModificationsAreAllowed();
+        checkIfStateModificationsAreAllowed(this);
         if (hasInterceptors(this)) {
             var change = interceptChange(this, { object: this, type: "update", newValue: newValue });
             if (!change)
@@ -13635,7 +13632,7 @@ var isObservableValue = createInstanceofPredicate("ObservableValue", ObservableV
 function getAtom(thing, property) {
     if (typeof thing === "object" && thing !== null) {
         if (isObservableArray(thing)) {
-            invariant(property === undefined, "It is not possible to get index atoms from arrays");
+            invariant(property === undefined, getMessage("m036"));
             return thing.$mobx.atom;
         }
         if (isObservableMap(thing)) {
@@ -13785,6 +13782,49 @@ function arrayAsIterator(array) {
 function declareIterator(prototType, iteratorFactory) {
     addHiddenFinalProp(prototType, iteratorSymbol(), iteratorFactory);
 }
+var messages = {
+    "m001": "It is not allowed to assign new values to @action fields",
+    "m002": "`runInAction` expects a function",
+    "m003": "`runInAction` expects a function without arguments",
+    "m004": "autorun expects a function",
+    "m005": "Warning: attempted to pass an action to autorun. Actions are untracked and will not trigger on state changes. Use `reaction` or wrap only your state modification code in an action.",
+    "m006": "Warning: attempted to pass an action to autorunAsync. Actions are untracked and will not trigger on state changes. Use `reaction` or wrap only your state modification code in an action.",
+    "m007": "reaction only accepts 2 or 3 arguments. If migrating from MobX 2, please provide an options object",
+    "m008": "wrapping reaction expression in `asReference` is no longer supported, use options object instead",
+    "m009": "@computed can only be used on getter functions, like: '@computed get myProps() { return ...; }'. It looks like it was used on a property.",
+    "m010": "@computed can only be used on getter functions, like: '@computed get myProps() { return ...; }'",
+    "m011": "First argument to `computed` should be an expression. If using computed as decorator, don't pass it arguments",
+    "m012": "computed takes one or two arguments if used as function",
+    "m013": "[mobx.expr] 'expr' should only be used inside other reactive functions.",
+    "m014": "extendObservable expected 2 or more arguments",
+    "m015": "extendObservable expects an object as first argument",
+    "m016": "extendObservable should not be used on maps, use map.merge instead",
+    "m017": "all arguments of extendObservable should be objects",
+    "m018": "extending an object with another observable (object) is not supported. Please construct an explicit propertymap, using `toJS` if need. See issue #540",
+    "m019": "[mobx.isObservable] isObservable(object, propertyName) is not supported for arrays and maps. Use map.has or array.length instead.",
+    "m020": "modifiers can only be used for individual object properties",
+    "m021": "observable expects zero or one arguments",
+    "m022": "@observable can not be used on getters, use @computed instead",
+    "m023": "Using `transaction` is deprecated, use `runInAction` or `(@)action` instead.",
+    "m024": "whyRun() can only be used if a derivation is active, or by passing an computed value / reaction explicitly. If you invoked whyRun from inside a computation; the computation is currently suspended but re-evaluating because somebody requested its value.",
+    "m025": "whyRun can only be used on reactions and computed values",
+    "m026": "`action` can only be invoked on functions",
+    "m028": "It is not allowed to set `useStrict` when a derivation is running",
+    "m029": "INTERNAL ERROR only onBecomeUnobserved shouldn't be called twice in a row",
+    "m030a": "Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an `action` if this change is intended. Tried to modify: ",
+    "m030b": "Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, the render function of a React component? Tried to modify: ",
+    "m031": "Computed values are not allowed to not cause side effects by changing observables that are already being observed. Tried to modify: ",
+    "m032": "* This computation is suspended (not in use by any reaction) and won't run automatically.\n	Didn't expect this computation to be suspended at this point?\n	  1. Make sure this computation is used by a reaction (reaction, autorun, observer).\n	  2. Check whether you are using this computation synchronously (in the same stack as they reaction that needs it).",
+    "m033": "`observe` doesn't support the fire immediately property for observable maps.",
+    "m034": "`mobx.map` is deprecated, use `new ObservableMap` or `mobx.observable.map` instead",
+    "m035": "Cannot make the designated object observable; it is not extensible",
+    "m036": "It is not possible to get index atoms from arrays",
+    "m037": "Hi there! I'm sorry you have just run into an exception.\nIf your debugger ends up here, know that some reaction (like the render() of an observer component, autorun or reaction)\nthrew an exception and that mobx caught it, to avoid that it brings the rest of your application down.\nThe original cause of the exception (the code that caused this reaction to run (again)), is still in the stack.\n\nHowever, more interesting is the actual stack trace of the error itself.\nHopefully the error is an instanceof Error, because in that case you can inspect the original stack of the error from where it was thrown.\nSee `error.stack` property, or press the very subtle \"(...)\" link you see near the console.error message that probably brought you here.\nThat stack is more interesting than the stack of this console.error itself.\n\nIf the exception you see is an exception you created yourself, make sure to use `throw new Error(\"Oops\")` instead of `throw \"Oops\"`,\nbecause the javascript environment will only preserve the original stack trace in the first form.\n\nYou can also make sure the debugger pauses the next time this very same exception is thrown by enabling \"Pause on caught exception\".\n(Note that it might pause on many other, unrelated exception as well).\n\nIf that all doesn't help you out, feel free to open an issue https://github.com/mobxjs/mobx/issues!\n",
+    "m038": "Missing items in this list?\n    1. Check whether all used values are properly marked as observable (use isObservable to verify)\n    2. Make sure you didn't dereference values too early. MobX observes props, not primitives. E.g: use 'person.name' instead of 'name' in your computation.\n"
+};
+function getMessage(id) {
+    return messages[id];
+}
 var EMPTY_ARRAY = [];
 Object.freeze(EMPTY_ARRAY);
 function getGlobal() {
@@ -13856,6 +13896,9 @@ function objectAssign() {
     return res;
 }
 function valueDidChange(compareStructural, oldValue, newValue) {
+    if (typeof oldValue === 'number' && isNaN(oldValue)) {
+        return typeof newValue !== 'number' || !isNaN(newValue);
+    }
     return compareStructural
         ? !deepEqual(oldValue, newValue)
         : oldValue !== newValue;
