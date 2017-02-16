@@ -6360,9 +6360,15 @@ var dom;
 (function (dom) {
     var dloc = typeof document !== 'undefined' ? document.location : { hash: '' };
     function readHash() {
-        // Non-IE browsers return '' when the address bar shows '#'
-        // IE returns '#'. Normalize
+        // When the address bar shows '#'
+        // - Non-IE browsers return '' 
+        // - IE returns '#'
+        // Normalize to ''
         var hash = dloc.hash === '#' ? '' : dloc.hash;
+        // For empty path we should return `#/`
+        // This keeps the matching algorithm consistent and simple
+        if (hash === '')
+            return '#/';
         return hash;
     }
     dom.readHash = readHash;
@@ -17729,7 +17735,7 @@ exports.router = new index_1.Router([
             }
         },
     },
-    { $: '*', enter: function () { return routeState_1.routeState.setRoute('login'); } }
+    { $: '*', enter: function () { return routeState_1.routeState.setRoute('login'); } },
 ]);
 
 
